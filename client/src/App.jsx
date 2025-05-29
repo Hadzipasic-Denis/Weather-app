@@ -7,19 +7,19 @@ function App() {
   const [location, setLocation] = useState("Munich");
   const [searchInput, setSearchInput] = useState("");
 
-  // useEffect(() => {
-  //   axios
-  //     .get(
-  //       `https://api.weatherapi.com/v1/current.json?key=2b467482aab24006bc6205633251605&q=${location}`
-  //     )
-  //     .then((response) => {
-  //       setWeather(response.data);
-  //       console.log(response.data);
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // }, [location]);
+  useEffect(() => {
+    axios
+      .get(
+        `https://api.weatherapi.com/v1/current.json?key=2b467482aab24006bc6205633251605&q=${location}`
+      )
+      .then((response) => {
+        setWeather(response.data);
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [location]);
 
   const cities = [
     "Munich",
@@ -45,7 +45,7 @@ function App() {
           <div className="relative w-max">
             <input
               placeholder="Search..."
-              className="input shadow-lg focus:border-2 border-gray-300 px-5 pr-12 py-3 rounded-xl w-56 transition-all focus:w-64 outline-none"
+              className="shadow-lg focus:border-2 border-gray-400 px-5 pr-12 py-3 rounded-xl w-56 transition-all focus:w-64 outline-none"
               name="search"
               type="search"
               value={searchInput}
@@ -69,26 +69,29 @@ function App() {
             )}
           </div>
 
-          <div className="max-w-md py-4 px-8 bg-white shadow-lg rounded-lg my-20">
-            <div className="flex justify-center md:justify-end -mt-16">
-              <img
-                className="w-20 h-20 object-cover rounded-full border-2 border-gray-300 p-2"
-                // src={weather.current.condition.icon}
-                alt=""
-              />
-            </div>
-            <div>
-              <h2 className="text-gray-800 text-3xl font-semibold">{location}</h2>
-              <p className="mt-2 text-gray-600">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit...
-              </p>
-            </div>
-            <div className="flex justify-end mt-4">
-              <a href="#" className="text-xl font-medium text-indigo-500">
-                John Doe
-              </a>
-            </div>
-          </div>
+<div className="relative max-w-md p-1 bg-gradient-to-r from-blue-500 to-blue-300 shadow-xl rounded-lg my-20 text-white">
+  <div className="border-2 p-2 border-white rounded-lg">
+  <div className="absolute -top-10 right-4 z-10 bg-white rounded-full p-2 shadow-md border border-gray-300">
+    <img
+      className="w-20 h-20 object-cover"
+      src={weather.current.condition.icon}
+      alt="Weather icon"
+    />
+  </div>
+  <div>
+    <h2 className="text-white text-3xl font-semibold">{location}</h2>
+    <p className="mt-2 text-white">
+      Lorem ipsum dolor sit amet consectetur adipisicing elit...
+    </p>
+  </div>
+  <div className="flex justify-end mt-4">
+    <a href="#" className="text-xl font-medium text-indigo-200">
+      John Doe
+    </a>
+  </div>
+</div>
+  </div>
+
         </div>
       )}
     </>
