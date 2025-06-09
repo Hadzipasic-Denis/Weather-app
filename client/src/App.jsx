@@ -225,13 +225,46 @@ function App() {
                   {weather.current?.condition.text}
                 </span>
               </div>
+
+              <div className="flex gap-6 justify-center mt-5 rounded-xl py-3 px-6" style={{ backgroundColor: getOverlayColor(weatherCode, isDay) }}>
+                {forecast?.forecast?.forecastday.map((forecast) => {
+                  const dayName = new Date(forecast.date).toLocaleDateString(
+                    "en-US",
+                    { weekday: "short" }
+                  );
+
+                  return (
+                    <div className="text-[14px] flex flex-col items-center">
+                      <p>{dayName}</p>
+                      <img
+                        width={45}
+                        src={forecast.day.condition.icon}
+                        alt={forecast.day.condition.text}
+                      />
+                      <p className="flex items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width={18}
+                          height={18}
+                          viewBox="0 0 512 512"
+                        >
+                          <path
+                            fill="#fbfafa"
+                            d="M406.043 316c24.11 96.443-50.59 180-150 180s-174.405-82.38-150-180c15-60 90-150 150-300c60 150 135 240 150 300"
+                          ></path>
+                        </svg>
+                        {forecast.day.daily_chance_of_rain} %
+                      </p>
+                      <p>
+                        {forecast.day.mintemp_c}° / {forecast.day.maxtemp_c}°
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             <div>
-              <div className="w-full text-left px-4 text-[10px] text-white opacity-80">
-                <span>(Updated: </span>
-                {weather.current?.last_updated})
-              </div>
               <div
                 className="p-4 rounded-b-lg"
                 style={{ backgroundColor: getOverlayColor(weatherCode, isDay) }}
