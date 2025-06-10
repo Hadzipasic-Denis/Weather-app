@@ -14,14 +14,33 @@ import mist_d from "../src/assets/mist_d.png";
 import mist_n from "../src/assets/mist_n.png";
 
 function App() {
-  const [weather, setWeather] = useState("A");
+  const [weather, setWeather] = useState(null);
   const [forecast, setForecast] = useState("Munich");
   const [location, setLocation] = useState("Munich");
   const [searchInput, setSearchInput] = useState("");
   const [isFocused, setIsFocused] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [suggestedCities, setSuggestedCities] = useState([]);
 
   useEffect(() => {
+    axios
+      .get("https://ipapi.co/json/")
+      .then((response) => {
+        const city = response.data.city;
+        setLocation(city);
+      })
+      .catch((error) => {
+        console.log("Location detection failed:", error);
+        setLocation("Munich");
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!location) {
+      return;
+    }
+    setLoading(true);
+
     axios
       .get(
         `https://api.weatherapi.com/v1/current.json?key=${
@@ -30,7 +49,6 @@ function App() {
       )
       .then((response) => {
         setWeather(response.data);
-        console.log(response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -44,16 +62,13 @@ function App() {
       )
       .then((response) => {
         setForecast(response.data);
-        console.log(response.data);
       })
       .catch((error) => {
         console.log(error);
+      })
+      .finally(() => {
+        setLoading(false);
       });
-
-    if (!searchInput) {
-      setSuggestedCities([]);
-      return;
-    }
   }, [location]);
 
   useEffect(() => {
@@ -66,7 +81,6 @@ function App() {
         )
         .then((response) => {
           setSuggestedCities(response.data);
-          console.log(res.data);
         })
         .catch((err) => console.error(err));
     }, 300);
@@ -161,16 +175,22 @@ function App() {
 
   return (
     <>
-      {!weather ? (
-        <p>Loading</p>
+      {loading || !weather ? (
+        <div className="mt-18 flex gap-4 p-4 flex-wrap justify-center">
+          <img
+            className="w-20 h-20 animate-spin"
+            src="https://www.svgrepo.com/show/70469/loading.svg"
+            alt="Loading icon"
+          />
+        </div>
       ) : (
         <div className="flex flex-col items-center justify-center mt-6">
-          <div className="relative w-max">
+          <div className="flex justify-center w-full max-w-xl">
             <input
-              placeholder={isFocused ? "" : "Search..."}
+              placeholder={isFocused ? "" : "Enter city name"}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              className="text-center text-lg text-slate-900 shadow-lg border-[1px] border-slate-300 min-w-[450px] max-w-xl border-gray-400 px-5 py-2 rounded-t-lg w-56 transition-all focus:w-64 outline-none"
+              className="w-[99%] text-center text-lg text-slate-900 shadow-lg border-[1px] border-slate-300 border-gray-400 px-5 py-2 rounded-t-lg outline-none lg:max-w-[480px]"
               name="search"
               type="search"
               value={searchInput}
@@ -178,7 +198,7 @@ function App() {
             />
 
             {searchInput && suggestedCities.length > 0 && (
-              <ul className="absolute text-slate-900 bg-white border border-gray-300 mt-1 w-full rounded-md z-10 max-h-48 overflow-y-auto">
+              <ul className="absolute text-slate-900 bg-white border border-gray-300 mt-12 w-[99%] rounded-md z-10 max-h-48 overflow-y-auto">
                 {suggestedCities.map((city) => (
                   <li
                     key={city.id}
@@ -196,11 +216,11 @@ function App() {
           </div>
 
           <div
-            className="flex flex-col justify-between pt-6 relative min-w-[450px] min-h-[500px] max-w-xl rounded-b-lg text-white"
+            className="flex flex-col justify-between pt-6 relative rounded-b-lg text-white w-[99%] min-h-[550px] lg:max-w-[480px]"
             style={{
               backgroundImage: `url(${getBackgroundImage(weatherCode, isDay)})`,
               backgroundSize: "cover",
-              backgroundPosition: "center",
+              backgroundPosition: "calc(50% - 20px) center",
             }}
           >
             <div className="flex flex-col items-center">
@@ -226,15 +246,21 @@ function App() {
                 </span>
               </div>
 
-              <div className="flex gap-6 justify-center mt-5 rounded-xl py-3 px-6" style={{ backgroundColor: getOverlayColor(weatherCode, isDay) }}>
-                {forecast?.forecast?.forecastday.map((forecast) => {
+              <div
+                className="flex gap-6 justify-center mt-10 rounded-xl py-3 px-6"
+                style={{ backgroundColor: getOverlayColor(weatherCode, isDay) }}
+              >
+                {forecast?.forecast?.forecastday.map((forecast, index) => {
                   const dayName = new Date(forecast.date).toLocaleDateString(
                     "en-US",
                     { weekday: "short" }
                   );
 
                   return (
-                    <div className="text-[14px] flex flex-col items-center">
+                    <div
+                      className="text-[14px] flex flex-col items-center"
+                      key={index}
+                    >
                       <p>{dayName}</p>
                       <img
                         width={45}
@@ -313,7 +339,7 @@ function App() {
                           ></path>
                         </g>
                       </svg>
-                      Wind direction:
+                      Direction:
                     </div>
                     <div> {weather.current?.wind_dir}</div>
                   </div>
