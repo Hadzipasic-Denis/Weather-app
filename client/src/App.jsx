@@ -135,6 +135,8 @@ function App() {
     return sunny_d;
   };
 
+
+
   const getOverlayColor = (code, isDay) => {
     const daytime = Number(isDay) === 1;
 
@@ -172,7 +174,8 @@ function App() {
 
   const weatherCode = weather?.current?.condition?.code;
   const isDay = weather?.current?.is_day;
-
+  const bgImage = getBackgroundImage(weatherCode, isDay);
+  const isClearNight = bgImage === clear_n;
   return (
     <>
       {loading || !weather ? (
@@ -198,7 +201,7 @@ function App() {
             />
 
             {searchInput && suggestedCities.length > 0 && (
-              <ul className="absolute text-slate-900 bg-white border border-gray-300 mt-12 w-[99%] rounded-md z-10 max-h-48 overflow-y-auto">
+              <ul className="absolute text-slate-900 bg-white border border-gray-300 mt-12 w-[99%] rounded-md z-10 max-h-48 overflow-y-auto lg:max-w-[480px]">
                 {suggestedCities.map((city) => (
                   <li
                     key={city.id}
@@ -218,9 +221,11 @@ function App() {
           <div
             className="flex flex-col justify-between pt-6 relative rounded-b-lg text-white w-[99%] min-h-[550px] lg:max-w-[480px]"
             style={{
-              backgroundImage: `url(${getBackgroundImage(weatherCode, isDay)})`,
+              backgroundImage: `url(${bgImage})`,
               backgroundSize: "cover",
-              backgroundPosition: "calc(50% - 20px) center",
+              backgroundPosition: isClearNight
+                ? "calc(50% - 20px) center"
+                : "calc(50% - 0px) center",
             }}
           >
             <div className="flex flex-col items-center">
